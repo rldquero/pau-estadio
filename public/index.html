@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAU ESTADIO</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="sidebar">
+    <h2>PAU ESTADIO</h2>
+
+    <button onclick="modo='vigilante'">Añadir vigilante</button>
+    <button onclick="modo='auxiliar'">Añadir auxiliar</button>
+    <button onclick="modo='sanitario'">Añadir sanitario</button>
+    <button onclick="modo='puerta'">Añadir puerta</button>
+    <button onclick="modo='extintor'">Añadir extintor</button>
+    <button onclick="modo='salida'">Añadir salida</button>
+    <button onclick="modo='incidencia'">Añadir incidencia</button>
+
+    <hr>
+
+    <button onclick="enviarProtocolo('Evacuación')">Protocolo evacuación</button>
+    <button onclick="enviarProtocolo('Sanitario')">Protocolo sanitario</button>
+    <button onclick="enviarProtocolo('Refuerzo en puerta')">Refuerzo en puerta</button>
+
+    <hr>
+
+    <button onclick="generarInformeFinal()">Generar informe final PDF</button>
+  </div>
+
+  <div class="content">
+    <h1>Plano operativo del estadio</h1>
+    <p id="modoTexto">Selecciona un tipo de punto y haz clic en el plano.</p>
+    <div id="map"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Datos del partido</h3>
+    <input id="partidoNombre" placeholder="Partido / evento">
+    <input id="fechaPartido" placeholder="Fecha">
+    <input id="responsablePartido" placeholder="Responsable operativo">
+
+    <h3>Cronología del partido</h3>
+    <input id="horaCronologia" placeholder="Hora. Ej: 18:00">
+    <input id="textoCronologia" placeholder="Actuación. Ej: Apertura puertas">
+    <button onclick="agregarCronologia()">Añadir a cronología</button>
+    <div id="cronologia"></div>
+
+    <h3>Mensajes operativos</h3>
+    <div id="mensajes"></div>
+
+    <input id="mensajeInput" placeholder="Escribir mensaje...">
+    <button onclick="enviarMensaje()">Enviar texto</button>
+
+    <label class="fileBtn">
+      Enviar foto
+      <input type="file" accept="image/*" onchange="enviarArchivo(event,'foto')" hidden>
+    </label>
+
+    <label class="fileBtn">
+      Enviar vídeo
+      <input type="file" accept="video/*" onchange="enviarArchivo(event,'video')" hidden>
+    </label>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
