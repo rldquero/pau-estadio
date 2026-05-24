@@ -1,76 +1,139 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PAU ESTADIO</title>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-  <link rel="stylesheet" href="style.css">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PAU Estadio</title>
+
+<link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-  <div class="sidebar">
-    <h2>PAU ESTADIO</h2>
+<h1>PAU ESTADIO</h1>
 
-    <button onclick="modo='vigilante'">Añadir vigilante</button>
-    <button onclick="modo='auxiliar'">Añadir auxiliar</button>
-    <button onclick="modo='sanitario'">Añadir sanitario</button>
-    <button onclick="modo='puerta'">Añadir puerta</button>
-    <button onclick="modo='extintor'">Añadir extintor</button>
-    <button onclick="modo='salida'">Añadir salida</button>
-    <button onclick="modo='incidencia'">Añadir incidencia</button>
+<div class="contenedor">
 
-    <hr>
+<div class="bloque">
 
-    <button onclick="enviarProtocolo('Evacuación')">Protocolo evacuación</button>
-    <button onclick="enviarProtocolo('Sanitario')">Protocolo sanitario</button>
-    <button onclick="enviarProtocolo('Refuerzo en puerta')">Refuerzo en puerta</button>
+<h2>Cronología del partido</h2>
 
-    <hr>
+<div style="display:flex; gap:10px; margin-bottom:10px;">
 
-    <button onclick="generarInformeFinal()">Generar informe final PDF</button>
-  </div>
+<select id="eventoCronologia" style="flex:1; padding:10px;">
 
-  <div class="content">
-    <h1>Plano operativo del estadio</h1>
-    <p id="modoTexto">Selecciona un tipo de punto y haz clic en el plano.</p>
-    <div id="map"></div>
-  </div>
+<option value="">Seleccionar evento...</option>
 
-  <div class="panel">
-    <h3>Datos del partido</h3>
-    <input id="partidoNombre" placeholder="Partido / evento">
-    <input id="fechaPartido" placeholder="Fecha">
-    <input id="responsablePartido" placeholder="Responsable operativo">
+<option>Apertura de puertas</option>
+<option>Inicio dispositivo preventivo</option>
+<option>Activado protocolo grada visitante</option>
+<option>Incidencia acceso puerta 1</option>
+<option>Incidencia acceso puerta 2</option>
+<option>Incidencia acceso puerta 3</option>
+<option>Se recibe fotografía</option>
+<option>Inicio del partido</option>
+<option>Atención sanitaria grada norte</option>
+<option>Atención sanitaria grada sur</option>
+<option>Atención sanitaria grada visitante</option>
+<option>Intervención seguridad privada</option>
+<option>Intervención Policía Local</option>
+<option>Intervención Guardia Civil</option>
+<option>Lanzamiento de objetos</option>
+<option>Parada temporal del partido</option>
+<option>Reanudación del partido</option>
+<option>Finalización del partido</option>
+<option>Salida escalonada del público</option>
+<option>Cierre del dispositivo</option>
 
-    <h3>Cronología del partido</h3>
-    <input id="horaCronologia" placeholder="Hora. Ej: 18:00">
-    <input id="textoCronologia" placeholder="Actuación. Ej: Apertura puertas">
-    <button onclick="agregarCronologia()">Añadir a cronología</button>
-    <div id="cronologia"></div>
+</select>
 
-    <h3>Mensajes operativos</h3>
-    <div id="mensajes"></div>
+<button type="button" onclick="añadirCronologia()">
+Añadir
+</button>
 
-    <input id="mensajeInput" placeholder="Escribir mensaje...">
-    <button onclick="enviarMensaje()">Enviar texto</button>
+</div>
 
-    <label class="fileBtn">
-      Enviar foto
-      <input type="file" accept="image/*" onchange="enviarArchivo(event,'foto')" hidden>
-    </label>
+<textarea id="cronologia" rows="12"></textarea>
 
-    <label class="fileBtn">
-      Enviar vídeo
-      <input type="file" accept="video/*" onchange="enviarArchivo(event,'video')" hidden>
-    </label>
-  </div>
+</div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="app.js"></script>
+<div class="bloque">
+
+<h2>Protocolos</h2>
+
+<div class="protocolos">
+
+<button onclick="añadirProtocolo('Activado protocolo sanitario')">
+🚑 Protocolo sanitario
+</button>
+
+<button onclick="añadirProtocolo('Activado protocolo grada visitante')">
+👥 Grada visitante
+</button>
+
+<button onclick="añadirProtocolo('Aviso a Policía Local')">
+👮 Policía Local
+</button>
+
+<button onclick="añadirProtocolo('Aviso a Guardia Civil')">
+🚓 Guardia Civil
+</button>
+
+<button onclick="añadirProtocolo('Activado protocolo antiviolencia')">
+🚨 Protocolo antiviolencia
+</button>
+
+<button onclick="añadirProtocolo('Prohibido entrar al terreno de juego')">
+⛔ Prohibido saltar al campo
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function añadirCronologia(){
+
+const select = document.getElementById("eventoCronologia");
+const textarea = document.getElementById("cronologia");
+
+if(select.value === "") return;
+
+const ahora = new Date();
+
+const hora = ahora.toLocaleTimeString("es-ES",{
+hour:"2-digit",
+minute:"2-digit"
+});
+
+textarea.value += hora + " - " + select.value + "\n";
+
+select.value = "";
+
+}
+
+function añadirProtocolo(texto){
+
+const textarea = document.getElementById("cronologia");
+
+const ahora = new Date();
+
+const hora = ahora.toLocaleTimeString("es-ES",{
+hour:"2-digit",
+minute:"2-digit"
+});
+
+textarea.value += hora + " - " + texto + "\n";
+
+}
+
+</script>
 
 </body>
 </html>
