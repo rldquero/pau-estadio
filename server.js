@@ -1,86 +1,81 @@
-const express = require("express")
-const path = require("path")
-const PDFDocument = require("pdfkit")
+const express = require("express");
+const path = require("path");
+const PDFDocument = require("pdfkit");
 
-const app = express()
+const app = express();
 
-app.use(express.json())
+app.use(express.json());
 
-app.use(express.static(path.join(__dirname, "public")))
+app.use(express.static(path.join(__dirname, "Público")));
 
-
-// GENERAR PDF
 app.post("/generar-pdf", (req, res) => {
 
-    const datos = req.body
+    const datos = req.body;
 
-    const doc = new PDFDocument()
+    const doc = new PDFDocument();
 
-    const nombreArchivo = `informe_${Date.now()}.pdf`
-
-    res.setHeader("Content-Type", "application/pdf")
+    res.setHeader("Content-Type", "application/pdf");
 
     res.setHeader(
         "Content-Disposition",
-        `attachment; filename=${nombreArchivo}`
-    )
+        "attachment; filename=informe_evento.pdf"
+    );
 
-    doc.pipe(res)
+    doc.pipe(res);
 
-    // TITULO
     doc
-        .fontSize(22)
-        .text("INFORME FINAL DEL EVENTO", {
+        .fontSize(24)
+        .text("INFORME EVENTO SAFETY STADIUM", {
             align: "center"
-        })
+        });
 
-    doc.moveDown()
+    doc.moveDown();
 
-    doc.fontSize(14)
+    doc.fontSize(14);
 
-    doc.text(`Partido: ${datos.partido || ""}`)
-    doc.text(`Fecha: ${datos.fecha || ""}`)
-    doc.text(`Estadio: ${datos.estadio || ""}`)
+    doc.text(`Jornada: ${datos.jornada || ""}`);
+    doc.text(`Partido: ${datos.partido || ""}`);
+    doc.text(`Responsable: ${datos.responsable || ""}`);
+    doc.text(`Fecha: ${datos.fecha || ""}`);
 
-    doc.moveDown()
+    doc.moveDown();
 
     doc
         .fontSize(18)
-        .text("CRONOLOGÍA")
+        .text("CRONOLOGÍA");
 
-    doc.moveDown()
+    doc.moveDown();
 
-    if (datos.cronologia) {
+    if(datos.cronologia){
 
         datos.cronologia.forEach(item => {
 
             doc
                 .fontSize(12)
-                .text(`${item.hora} - ${item.texto}`)
+                .text(`${item.hora} - ${item.texto}`);
 
-        })
+        });
 
     }
 
-    doc.moveDown()
+    doc.moveDown();
 
     doc
         .fontSize(18)
-        .text("OBSERVACIONES")
+        .text("OBSERVACIONES");
 
-    doc.moveDown()
+    doc.moveDown();
 
     doc
         .fontSize(12)
-        .text(datos.observaciones || "Sin observaciones")
+        .text(datos.observaciones || "Sin observaciones");
 
-    doc.end()
+    doc.end();
 
-})
+});
 
-
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`Servidor funcionando en puerto ${PORT}`)
-})
+    console.log(`Servidor funcionando en puerto ${PORT}`);
+});
