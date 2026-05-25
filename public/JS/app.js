@@ -386,6 +386,10 @@ formulario.addEventListener("submit", function(e){
 // BOTON PDF
 // ==========================
 
+// ==========================
+// BOTON PDF jsPDF
+// ==========================
+
 if(btnPDF){
 
     btnPDF.disabled = false;
@@ -394,75 +398,106 @@ if(btnPDF){
 
     btnPDF.style.cursor = "pointer";
 
-    btnPDF.addEventListener("click", async () => {
+    btnPDF.addEventListener("click", () => {
 
-        try{
+        const { jsPDF } = window.jspdf;
 
-            alert("Generando PDF...");
+        const doc = new jsPDF();
 
-            const datosPDF = {
+        // ==========================
+        // TITULO
+        // ==========================
 
-                jornada: jornada ? jornada.value : "",
+        doc.setFontSize(20);
 
-                partido: partido ? partido.value : "",
+        doc.text(
+            "INFORME OPERATIVO SAFETY STADIUM",
+            105,
+            20,
+            { align: "center" }
+        );
 
-                responsable: responsable ? responsable.value : "",
+        // ==========================
+        // DATOS
+        // ==========================
 
-                fecha: new Date().toLocaleDateString(),
+        doc.setFontSize(12);
 
-                estadio: "Safety Stadium",
+        doc.text(`Jornada: ${jornada ? jornada.value : ""}`, 20, 40);
 
-                cronologia: registrosPDF,
+        doc.text(`Partido: ${partido ? partido.value : ""}`, 20, 48);
 
-                observaciones: "Informe generado automáticamente"
+        doc.text(`Responsable: ${responsable ? responsable.value : ""}`, 20, 56);
 
-            };
+        doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 20, 64);
 
-            const respuesta = await fetch("/generar-pdf", {
+        // ==========================
+        // CRONOLOGIA
+        // ==========================
 
-                method:"POST",
+        doc.setFontSize(16);
 
-                headers:{
-                    "Content-Type":"application/json"
-                },
+        doc.text("CRONOLOGÍA OPERATIVA", 20, 84);
 
-                body: JSON.stringify(datosPDF)
+        let y = 96;
+
+        if(registrosPDF.length > 0){
+
+            registrosPDF.forEach(item => {
+
+                doc.setFontSize(10);
+
+                doc.text(
+                    `${item.hora} - ${item.texto}`,
+                    20,
+                    y
+                );
+
+                y += 8;
+
+                if(y > 280){
+
+                    doc.addPage();
+
+                    y = 20;
+
+                }
 
             });
 
-            if(!respuesta.ok){
+        }else{
 
-                alert("Error generando PDF");
+            doc.setFontSize(10);
 
-                return;
-
-            }
-
-            const blob = await respuesta.blob();
-
-            const url = window.URL.createObjectURL(blob);
-
-            const enlace = document.createElement("a");
-
-            enlace.href = url;
-
-            enlace.download = "informe_evento.pdf";
-
-            document.body.appendChild(enlace);
-
-            enlace.click();
-
-            enlace.remove();
-
-            window.URL.revokeObjectURL(url);
-
-        }catch(error){
-
-            console.error(error);
-
-            alert("Error al generar PDF");
+            doc.text("No hay registros.", 20, y);
 
         }
+
+        // ==========================
+        // OBSERVACIONES
+        // ==========================
+
+        y += 20;
+
+        doc.setFontSize(16);
+
+        doc.text("OBSERVACIONES", 20, y);
+
+        y += 10;
+
+        doc.setFontSize(10);
+
+        doc.text(
+            "Informe generado automáticamente desde Safety Stadium.",
+            20,
+            y
+        );
+
+        // ==========================
+        // DESCARGAR
+        // ==========================
+
+        doc.save("informe_evento.pdf");
 
     });
 
