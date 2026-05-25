@@ -10,6 +10,12 @@ const zona = document.getElementById("zona");
 const estado = document.getElementById("estado");
 const descripcion = document.getElementById("descripcion");
 
+const jornada = document.getElementById("jornada");
+const partido = document.getElementById("partido");
+const responsable = document.getElementById("responsable");
+
+const btnPDF = document.getElementById("btnPDF");
+
 const camposPci = document.getElementById("camposPci");
 const fechaRevision = document.getElementById("fechaRevision");
 const proximaRevision = document.getElementById("proximaRevision");
@@ -27,6 +33,8 @@ const leyenda = document.getElementById("leyenda");
 
 let puntoSeleccionado = null;
 let modoActual = "safety";
+
+let registrosPDF = [];
 
 const tiposSafety = [
     {
@@ -119,9 +127,11 @@ const tiposPci = [
 ];
 
 function cargarModo(modo){
+
     modoActual = modo;
 
     puntoSeleccionado = null;
+
     formulario.reset();
 
     marcadores.innerHTML = "";
@@ -132,72 +142,111 @@ function cargarModo(modo){
     modoPci.classList.remove("activo");
 
     if(modo === "safety"){
+
         modoSafety.classList.add("activo");
+
         camposPci.classList.add("oculto");
 
         tituloOperativa.textContent = "Operativa Safety";
+
         tituloFormulario.textContent = "Nueva incidencia Safety";
+
         tituloLista.textContent = "Incidencias registradas";
+
         avisoModo.textContent = "1. Selecciona tipo · 2. Pulsa sobre el plano · 3. Describe · 4. Guarda";
 
         pintarOpciones(tiposSafety);
+
     }
 
     if(modo === "pci"){
+
         modoPci.classList.add("activo");
+
         camposPci.classList.remove("oculto");
 
         tituloOperativa.textContent = "PAU / PCI / Mantenimiento";
+
         tituloFormulario.textContent = "Nuevo registro PAU / PCI";
+
         tituloLista.textContent = "Libro registro / mantenimiento";
-        avisoModo.textContent = "Marca en el plano el elemento o incidencia técnica y registra revisión, estado, empresa y próxima fecha.";
+
+        avisoModo.textContent = "Marca en el plano el elemento o incidencia técnica.";
 
         pintarOpciones(tiposPci);
+
     }
+
 }
 
 function pintarOpciones(lista){
+
     tipo.innerHTML = `<option value="">Tipo de registro</option>`;
+
     botonesOperativa.innerHTML = "";
+
     leyenda.innerHTML = "";
 
     lista.forEach(item => {
+
         const opcion = document.createElement("option");
+
         opcion.value = item.nombre;
+
         opcion.textContent = item.nombre;
+
         tipo.appendChild(opcion);
 
         const boton = document.createElement("button");
+
         boton.className = `btn ${item.clase}`;
+
         boton.dataset.tipo = item.nombre;
+
         boton.innerHTML = `${item.icono} ${item.nombre}`;
+
         botonesOperativa.appendChild(boton);
 
         boton.addEventListener("click", () => {
+
             tipo.value = item.nombre;
+
         });
 
         const leyendaItem = document.createElement("span");
+
         leyendaItem.innerHTML = `<b class="dot" style="background:${item.color}"></b> ${item.nombre}`;
+
         leyenda.appendChild(leyendaItem);
+
     });
+
 }
 
 function datosTipo(nombre){
+
     const lista = modoActual === "safety" ? tiposSafety : tiposPci;
+
     return lista.find(item => item.nombre === nombre) || {
+
         color:"#64748b",
+
         icono:`<i class="fa-solid fa-location-dot"></i>`
+
     };
+
 }
 
 modoSafety.addEventListener("click", () => cargarModo("safety"));
+
 modoPci.addEventListener("click", () => cargarModo("pci"));
 
 mapa.addEventListener("click", function(e){
+
     const rect = mapa.getBoundingClientRect();
 
     const x = ((e.clientX - rect.left) / rect.width) * 100;
+
     const y = ((e.clientY - rect.top) / rect.height) * 100;
 
     puntoSeleccionado = { x, y };
@@ -205,36 +254,53 @@ mapa.addEventListener("click", function(e){
     zona.value = `Punto marcado (${x.toFixed(1)}%, ${y.toFixed(1)}%)`;
 
     crearMarcadorTemporal(x, y);
+
     descripcion.focus();
+
 });
 
 function crearMarcadorTemporal(x, y){
+
     const viejo = document.querySelector(".marcador-temporal");
 
     if(viejo){
+
         viejo.remove();
+
     }
 
     const marcador = document.createElement("div");
+
     marcador.className = "marcador marcador-temporal";
+
     marcador.innerHTML = `<i class="fa-solid fa-location-dot"></i>`;
+
     marcador.style.left = `${x}%`;
+
     marcador.style.top = `${y}%`;
 
     marcadores.appendChild(marcador);
+
 }
 
 formulario.addEventListener("submit", function(e){
+
     e.preventDefault();
 
     if(tipo.value === ""){
+
         alert("Selecciona un tipo de registro.");
+
         return;
+
     }
 
     if(!puntoSeleccionado){
-        alert("Primero debes marcar un punto en el plano.");
+
+        alert("Primero debes marcar un punto.");
+
         return;
+
     }
 
     const datos = datosTipo(tipo.value);
@@ -242,54 +308,164 @@ formulario.addEventListener("submit", function(e){
     const temporal = document.querySelector(".marcador-temporal");
 
     if(temporal){
+
         temporal.classList.remove("marcador-temporal");
+
         temporal.innerHTML = datos.icono;
+
         temporal.style.background = datos.color;
+
     }
 
     const hora = new Date().toLocaleTimeString([], {
+
         hour:"2-digit",
+
         minute:"2-digit"
+
+    });
+
+    registrosPDF.push({
+
+        hora: hora,
+
+        texto: `${tipo.value} - ${estado.value} - ${descripcion.value}`
+
     });
 
     const tarjeta = document.createElement("div");
+
     tarjeta.className = "tarjeta-incidencia";
+
     tarjeta.style.borderLeft = `6px solid ${datos.color}`;
 
-    let extraPci = "";
-
-    if(modoActual === "pci"){
-        extraPci = `
-            <p><strong>Fecha revisión:</strong> ${fechaRevision.value || "No indicada"}</p>
-            <p><strong>Próxima revisión:</strong> ${proximaRevision.value || "No indicada"}</p>
-            <p><strong>Empresa / responsable:</strong> ${empresa.value || "No indicado"}</p>
-        `;
-    }
-
     tarjeta.innerHTML = `
+
         <div class="hora">${hora}</div>
+
         <h4>${datos.icono} ${tipo.value}</h4>
-        <p><strong>Modo:</strong> ${modoActual === "safety" ? "Safety / Emergencias" : "PAU / PCI / Mantenimiento"}</p>
-        <p><strong>Estado:</strong> <span class="etiqueta" style="background:${datos.color}">${estado.value}</span></p>
+
+        <p><strong>Jornada:</strong> ${jornada.value}</p>
+
+        <p><strong>Partido:</strong> ${partido.value}</p>
+
+        <p><strong>Responsable:</strong> ${responsable.value}</p>
+
+        <p><strong>Estado:</strong> ${estado.value}</p>
+
         <p><strong>Zona:</strong> ${zona.value}</p>
-        ${extraPci}
-        <p><strong>Observaciones:</strong> ${descripcion.value || "Sin observaciones."}</p>
+
+        <p><strong>Observaciones:</strong> ${descripcion.value}</p>
+
     `;
 
     incidencias.prepend(tarjeta);
 
     const itemCrono = document.createElement("div");
+
     itemCrono.className = "item-crono";
+
     itemCrono.style.borderLeftColor = datos.color;
 
     itemCrono.innerHTML = `
-        <strong>${hora}</strong> · ${datos.icono} ${tipo.value} · ${estado.value}
+
+        <strong>${hora}</strong> · ${tipo.value} · ${estado.value}
+
     `;
 
     cronologia.prepend(itemCrono);
 
     formulario.reset();
+
     puntoSeleccionado = null;
+
 });
+
+
+// ==========================
+// BOTON PDF
+// ==========================
+
+if(btnPDF){
+
+    btnPDF.disabled = false;
+
+    btnPDF.style.opacity = "1";
+
+    btnPDF.style.cursor = "pointer";
+
+    btnPDF.addEventListener("click", async () => {
+
+        try{
+
+            alert("Generando PDF...");
+
+            const datosPDF = {
+
+                jornada: jornada ? jornada.value : "",
+
+                partido: partido ? partido.value : "",
+
+                responsable: responsable ? responsable.value : "",
+
+                fecha: new Date().toLocaleDateString(),
+
+                estadio: "Safety Stadium",
+
+                cronologia: registrosPDF,
+
+                observaciones: "Informe generado automáticamente"
+
+            };
+
+            const respuesta = await fetch("/generar-pdf", {
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body: JSON.stringify(datosPDF)
+
+            });
+
+            if(!respuesta.ok){
+
+                alert("Error generando PDF");
+
+                return;
+
+            }
+
+            const blob = await respuesta.blob();
+
+            const url = window.URL.createObjectURL(blob);
+
+            const enlace = document.createElement("a");
+
+            enlace.href = url;
+
+            enlace.download = "informe_evento.pdf";
+
+            document.body.appendChild(enlace);
+
+            enlace.click();
+
+            enlace.remove();
+
+            window.URL.revokeObjectURL(url);
+
+        }catch(error){
+
+            console.error(error);
+
+            alert("Error al generar PDF");
+
+        }
+
+    });
+
+}
 
 cargarModo("safety");
