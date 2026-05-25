@@ -4,70 +4,84 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Safety Stadium</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="CSS/style.css">
 </head>
 
 <body>
 
 <header class="topbar">
-  <h1>SAFETY STADIUM</h1>
+  <h1><i class="fa-solid fa-shield-halved"></i> SAFETY STADIUM</h1>
+
+  <div class="modo-selector">
+    <button id="modoSafety" class="modo activo">Safety / Emergencias</button>
+    <button id="modoPci" class="modo">PAU / PCI / Mantenimiento</button>
+  </div>
 </header>
 
-<main class="contenedor">
+<main class="layout">
 
-  <section class="panel">
-    <h2>Operativa</h2>
-
-    <div class="botones">
-      <button class="btn rojo">Prevención Violencia</button>
-      <button class="btn naranja">Cánticos</button>
-      <button class="btn amarillo">Lanzamientos</button>
-      <button class="btn azul">Asistencia Sanitaria</button>
-      <button class="btn verde">Evacuación</button>
-    </div>
+  <section class="panel lateral">
+    <h2 id="tituloOperativa">Operativa</h2>
+    <div id="botonesOperativa"></div>
   </section>
 
   <section class="panel">
-    <h2>Nueva incidencia</h2>
+    <h2 id="tituloFormulario">Nueva incidencia</h2>
 
-    <div class="aviso">
-      Haz clic sobre el plano para marcar el punto exacto de la incidencia.
+    <div class="aviso" id="avisoModo">
+      1. Selecciona tipo · 2. Pulsa sobre el plano · 3. Describe · 4. Guarda
     </div>
 
     <form class="formulario">
-      <select id="tipo">
-        <option value="">Tipo de incidencia</option>
-        <option>Prevención Violencia</option>
-        <option>Cánticos</option>
-        <option>Lanzamientos</option>
-        <option>Asistencia Sanitaria</option>
-        <option>Evacuación</option>
+      <select id="tipo"></select>
+
+      <input id="zona" type="text" placeholder="Zona / punto marcado">
+
+      <select id="estado">
+        <option>Abierta</option>
+        <option>En seguimiento</option>
+        <option>Cerrada</option>
       </select>
 
-      <input id="zona" type="text" placeholder="Zona / Grada / Puerta">
-      <textarea id="descripcion" placeholder="Descripción"></textarea>
+      <div id="camposPci" class="campos-pci oculto">
+        <input id="fechaRevision" type="date">
+        <input id="proximaRevision" type="date">
+        <input id="empresa" type="text" placeholder="Empresa mantenedora / responsable">
+      </div>
 
-      <button class="btn azul" type="submit">Guardar incidencia</button>
+      <textarea id="descripcion" placeholder="Descripción / observaciones"></textarea>
+
+      <button class="btn azul" type="submit">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar registro
+      </button>
     </form>
 
     <div class="lista-incidencias">
-      <h3>Incidencias registradas</h3>
+      <h3 id="tituloLista">Registros</h3>
       <div id="incidencias"></div>
+    </div>
+
+    <div class="cronologia">
+      <h3>Cronología</h3>
+      <div id="cronologia"></div>
     </div>
   </section>
 
-  <section class="panel">
+  <section class="panel plano-panel">
     <h2>Plano Operativo</h2>
 
     <div id="mapa" class="mapa">
       <img src="IMG/estadio.jpg" alt="Plano estadio">
       <div id="marcadores"></div>
     </div>
+
+    <div class="leyenda" id="leyenda"></div>
   </section>
 
 </main>
 
 <script src="JS/app.js"></script>
-
 </body>
 </html>
