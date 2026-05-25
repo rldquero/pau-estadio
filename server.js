@@ -12,97 +12,67 @@ app.post("/generar-pdf", (req, res) => {
 
     const datos = req.body;
 
-    const doc = new PDFDocument({
-        margin: 40
-    });
+    const doc = new PDFDocument();
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", "attachment; filename=informe_evento.pdf");
+
+    res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=informe_evento.pdf"
+    );
 
     doc.pipe(res);
 
-    try {
-        doc.image(path.join(__dirname, "Público", "IMG", "logo.png"), 40, 30, {
-            width: 60
+    // TITULO
+    doc
+        .fontSize(22)
+        .text("INFORME OPERATIVO SAFETY STADIUM", {
+            align: "center"
         });
-    } catch (error) {
-        console.log("Logo no encontrado");
-    }
-
-    doc
-        .fontSize(24)
-        .fillColor("#111827")
-        .text("INFORME OPERATIVO SAFETY STADIUM", 120, 40);
-
-    doc
-        .fontSize(12)
-        .fillColor("#64748b")
-        .text("Sistema de gestión operativa y emergencias", 120, 75);
-
-    doc.moveDown(4);
-
-    doc
-        .fontSize(16)
-        .fillColor("#111827")
-        .text("DATOS DEL EVENTO");
 
     doc.moveDown();
 
-    doc
-        .fontSize(12)
-        .fillColor("#000000")
-        .text(`Jornada: ${datos.jornada || ""}`)
-        .text(`Partido: ${datos.partido || ""}`)
-        .text(`Responsable redacción: ${datos.responsable || ""}`)
-        .text(`Fecha informe: ${datos.fecha || ""}`);
+    // DATOS
+    doc.fontSize(14);
 
-    doc.moveDown(2);
-
-    doc
-        .fontSize(16)
-        .fillColor("#111827")
-        .text("CRONOLOGÍA OPERATIVA");
+    doc.text(`Jornada: ${datos.jornada || ""}`);
+    doc.text(`Partido: ${datos.partido || ""}`);
+    doc.text(`Responsable: ${datos.responsable || ""}`);
+    doc.text(`Fecha: ${datos.fecha || ""}`);
 
     doc.moveDown();
 
-    if (datos.cronologia && datos.cronologia.length > 0) {
+    // CRONOLOGIA
+    doc
+        .fontSize(18)
+        .text("CRONOLOGÍA");
+
+    doc.moveDown();
+
+    if(datos.cronologia){
 
         datos.cronologia.forEach(item => {
+
             doc
-                .fontSize(11)
-                .fillColor("#000000")
+                .fontSize(12)
                 .text(`${item.hora} - ${item.texto}`);
 
-            doc.moveDown(0.5);
         });
 
-    } else {
-        doc
-            .fontSize(11)
-            .fillColor("#000000")
-            .text("No hay registros en la cronología.");
     }
 
-    doc.moveDown(2);
+    doc.moveDown();
 
+    // OBSERVACIONES
     doc
-        .fontSize(16)
-        .fillColor("#111827")
+        .fontSize(18)
         .text("OBSERVACIONES");
 
     doc.moveDown();
 
     doc
-        .fontSize(11)
-        .fillColor("#000000")
-        .text(datos.observaciones || "Sin observaciones.");
-
-    doc.moveDown(4);
-
-    doc
         .fontSize(12)
-        .fillColor("#111827")
-        .text(`Redactado por: ${datos.responsable || ""}`);
+        .text(datos.observaciones || "Sin observaciones");
 
     doc.end();
 
@@ -111,5 +81,7 @@ app.post("/generar-pdf", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
+
     console.log(`Servidor funcionando en puerto ${PORT}`);
+
 });
