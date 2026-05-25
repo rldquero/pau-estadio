@@ -1,5 +1,13 @@
 {
+  "name": "pau-estadio",
+  "version": "1.0.0",
+  "description": "Aplicación PAU estadio",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^4.18.2",
+    "pdfkit": "^0.15.0"
   }
 }
