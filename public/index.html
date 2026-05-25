@@ -34,6 +34,12 @@
       1. Selecciona tipo · 2. Pulsa sobre el plano · 3. Describe · 4. Guarda
     </div>
 
+    <div class="datos-partido">
+      <input id="jornada" type="text" placeholder="Jornada del partido">
+      <input id="partido" type="text" placeholder="Partido / encuentro">
+      <input id="responsable" type="text" placeholder="Responsable que anota">
+    </div>
+
     <form class="formulario">
       <select id="tipo"></select>
 
@@ -57,6 +63,10 @@
         <i class="fa-solid fa-floppy-disk"></i> Guardar registro
       </button>
     </form>
+
+    <button id="btnPDF" class="btn pdf" type="button">
+      <i class="fa-solid fa-file-pdf"></i> Generar PDF del informe
+    </button>
 
     <div class="lista-incidencias">
       <h3 id="tituloLista">Registros</h3>
